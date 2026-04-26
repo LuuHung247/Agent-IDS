@@ -1,0 +1,18 @@
+services:
+  nos-sf:
+    build: .
+    image: nos-sf:latest
+    container_name: nos-sf
+    network_mode: host          # cần host net để reach virbr0 (192.168.122.x LEAFs)
+    restart: unless-stopped
+    volumes:
+      # Certificates và YANG files mount ngoài — rotate cert không cần rebuild image
+      - ./certificate:/app/certificate:ro
+      - ./yang:/app/yang:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
