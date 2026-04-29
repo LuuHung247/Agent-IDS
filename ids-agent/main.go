@@ -73,7 +73,7 @@ var (
 func pushBlockRule(srcIP, ruleID, reason string) ([]byte, error) {
 	if ruleID == "" {
 		safe := strings.NewReplacer(".", "-", "/", "-").Replace(srcIP)
-		ruleID = "ids-auto-" + safe
+		ruleID = "agent-" + safe
 	}
 	cidr := srcIP
 	if !strings.Contains(cidr, "/") {
@@ -84,7 +84,7 @@ func pushBlockRule(srcIP, ruleID, reason string) ([]byte, error) {
 		"action":   "DROP",
 		"src_ip":   cidr,
 		"priority": 50,
-		"source":   "ids-auto",
+		"source":   "agent",
 		"comment":  reason,
 	}
 	body, _ := json.Marshal(payload)

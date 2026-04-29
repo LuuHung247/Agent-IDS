@@ -16,7 +16,7 @@ Architecture (zero-trust micro-segmentation):
 RBAC (mTLS client cert OU):
   internal/sdnc → ADMIN     (full CRUD)
   aws           → OPERATOR  (read + Set, no delete)
-  auto          → AGENT     (DROP-only + source=ids-auto, defense in depth)
+  auto          → AGENT     (DROP-only + source=agent, defense in depth)
 
 Usage:
   python3 app.py \\

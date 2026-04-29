@@ -15,7 +15,7 @@ Bridge spec (verified 2026-04-26):
   - RBAC by client cert OU:
       internal/sdnc → ADMIN  (full CRUD)
       aws           → OPERATOR (no delete)
-      auto          → AGENT  (only action=DROP + source=ids-auto)
+      auto          → AGENT  (only action=DROP + source=agent)
 
 SF does NOT talk to SONiC telemetry :8080 — translib cannot handle custom
 YANG write, and telemetry runs --noTLS (separate Phase 2 issue).
@@ -25,7 +25,7 @@ Supports two NETCONF XML formats from SDNC:
   2. OpenConfig ACL — translated automatically
 
 Zone routing: src-ip → ip_to_leaf() → correct LEAF bridge client.
-AGENT auto-stamp: if session is AGENT role, force action=DROP + source=ids-auto.
+AGENT auto-stamp: if session is AGENT role, force action=DROP + source=agent.
 """
 
 import json
@@ -49,7 +49,7 @@ NS_OC_ACL = "http://openconfig.net/yang/acl"
 
 VALID_ACTIONS   = {"ACCEPT", "DROP", "RETURN"}
 VALID_PROTOCOLS = {"tcp", "udp", "icmp", "all"}
-VALID_SOURCES   = {"manual", "sdnc", "ids-auto"}
+VALID_SOURCES   = {"manual", "sdnc", "agent"}
 
 
 def _current_onap_role() -> Optional[OnapRole]:
@@ -255,9 +255,9 @@ class NetconfGnmiAdapter:
                 msg = f"AGENT role may only push DROP rules (got {data['action']})"
                 self.tamper_logger.log("security", "agent_action_blocked", msg, severity="warning")
                 return self._error(message_id, 'application', 'access-denied', msg)
-            data["source"] = "ids-auto"  # auto-stamp source for AGENT
+            data["source"] = "agent"  # auto-stamp source for AGENT
             if not data["comment"]:
-                data["comment"] = f"ids-auto:{rule_id}"
+                data["comment"] = f"agent:{rule_id}"
 
         return self._push_rule(rule_id, data, data["src-ip"], message_id)
 
